@@ -1,0 +1,12 @@
+services:
+  db:
+    image: postgres:latest
+    container_name: music-catalog
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=toy
+      - POSTGRES_PASSWORD=Manzl111
+      - POSTGRES_DB=music_catalog
+    volumes:
+      - /var/lib/docker/volumes/postgresql/data
