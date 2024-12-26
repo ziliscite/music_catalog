@@ -2,31 +2,27 @@ package config
 
 import "github.com/spf13/viper"
 
-type (
-	Config struct {
-		Service       Service
-		Database      DatabaseConfig
-		SpotifyConfig SpotifyConfig
-	}
+type Config struct {
+	Service       Service
+	Database      DatabaseConfig
+	SpotifyConfig SpotifyConfig
+}
 
-	Service struct {
-		Port      string
-		SecretKey string
-	}
+type Service struct {
+	Port      string
+	SecretKey string
+}
 
-	DatabaseConfig struct {
-		DataSourceName string
-	}
+type DatabaseConfig struct {
+	DataSourceName string
+}
 
-	SpotifyConfig struct {
-		ClientID     string
-		ClientSecret string
-	}
-)
+type SpotifyConfig struct {
+	ClientID     string
+	ClientSecret string
+}
 
-var (
-	config *Config
-)
+var config *Config
 
 // option defines configuration option.
 type option struct {
