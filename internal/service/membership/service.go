@@ -1,9 +1,9 @@
 package membership
 
 import (
-	"database/sql"
 	"errors"
 	"golang.org/x/crypto/bcrypt"
+	"gorm.io/gorm"
 	"music_catalog/internal/config"
 	"music_catalog/internal/models/membership"
 )
@@ -38,7 +38,7 @@ func NewService(cfg *config.Config, r Repository) *Service {
 func (s *Service) SignUp(request membership.SignUpRequest) error {
 	// check if email already exists
 	email, err := s.r.GetByEmail(request.Email)
-	if err != nil && !errors.Is(err, sql.ErrNoRows) {
+	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
 		return err
 	}
 
@@ -48,7 +48,7 @@ func (s *Service) SignUp(request membership.SignUpRequest) error {
 
 	// check if a username already exists
 	username, err := s.r.GetByUsername(request.Username)
-	if err != nil && !errors.Is(err, sql.ErrNoRows) {
+	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
 		return err
 	}
 

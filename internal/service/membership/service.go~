@@ -35,7 +35,7 @@ func NewService(cfg *config.Config, r Repository) *Service {
 	}
 }
 
-func (s *Service) SignUp(request *membership.SignUpRequest) error {
+func (s *Service) SignUp(request membership.SignUpRequest) error {
 	// check if email already exists
 	email, err := s.r.GetByEmail(request.Email)
 	if err != nil && !errors.Is(err, sql.ErrNoRows) {

@@ -1,0 +1,9 @@
+mock:
+	go generate ./...
+
+run:
+	go build -o /mnt/c/Users/manzi/GolandProjects/music_catalog/cmd/main/main.go
+	go run /mnt/c/Users/manzi/GolandProjects/music_catalog/main.exe
+
+test:
+	go test -v ./...

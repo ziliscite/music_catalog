@@ -1,9 +1,9 @@
 package membership
 
 import (
-	"database/sql"
 	"github.com/stretchr/testify/assert"
 	"go.uber.org/mock/gomock"
+	"gorm.io/gorm"
 	"music_catalog/internal/config"
 	"music_catalog/internal/models/membership"
 	"testing"
@@ -35,8 +35,8 @@ func TestService_SignUp(t *testing.T) {
 			},
 			wantErr: false,
 			mockFn: func(args args) {
-				mockRepository.EXPECT().GetByEmail(args.request.Email).Return(nil, sql.ErrNoRows)
-				mockRepository.EXPECT().GetByUsername(args.request.Username).Return(nil, sql.ErrNoRows)
+				mockRepository.EXPECT().GetByEmail(args.request.Email).Return(nil, gorm.ErrRecordNotFound)
+				mockRepository.EXPECT().GetByUsername(args.request.Username).Return(nil, gorm.ErrRecordNotFound)
 				mockRepository.EXPECT().Create(gomock.Any()).Return(nil)
 			},
 		},
@@ -65,7 +65,7 @@ func TestService_SignUp(t *testing.T) {
 			},
 			wantErr: true,
 			mockFn: func(args args) {
-				mockRepository.EXPECT().GetByEmail(args.request.Email).Return(nil, sql.ErrNoRows)
+				mockRepository.EXPECT().GetByEmail(args.request.Email).Return(nil, gorm.ErrRecordNotFound)
 				mockRepository.EXPECT().GetByUsername(args.request.Username).Return(nil, assert.AnError)
 			},
 		},
@@ -80,8 +80,8 @@ func TestService_SignUp(t *testing.T) {
 			},
 			wantErr: true,
 			mockFn: func(args args) {
-				mockRepository.EXPECT().GetByEmail(args.request.Email).Return(nil, sql.ErrNoRows)
-				mockRepository.EXPECT().GetByUsername(args.request.Username).Return(nil, sql.ErrNoRows)
+				mockRepository.EXPECT().GetByEmail(args.request.Email).Return(nil, gorm.ErrRecordNotFound)
+				mockRepository.EXPECT().GetByUsername(args.request.Username).Return(nil, gorm.ErrRecordNotFound)
 				mockRepository.EXPECT().Create(gomock.Any()).Return(assert.AnError)
 			},
 		},
