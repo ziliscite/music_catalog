@@ -16,7 +16,7 @@ func NewRepository(db *gorm.DB) *Repository {
 }
 
 func (r *Repository) Create(user *membership.User) error {
-	return r.db.Create(&user).Error
+	return r.db.Create(user).Error
 }
 
 func (r *Repository) GetByID(id uint) (*membership.User, error) {

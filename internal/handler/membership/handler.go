@@ -1,13 +1,15 @@
 package membership
 
 import (
+	"errors"
 	"github.com/gin-gonic/gin"
 	"music_catalog/internal/models/membership"
 	"net/http"
 )
 
+//go:generate mockgen -source=handler.go -destination=handler_mock.go -package=membership
 type Service interface {
-	SignUp(request *membership.SignUpRequest) error
+	SignUp(request membership.SignUpRequest) error
 }
 
 type Handler struct {
@@ -29,8 +31,14 @@ func (h *Handler) SignUp(c *gin.Context) {
 		return
 	}
 
-	if err := h.s.SignUp(&request); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+	err := h.s.SignUp(request)
+	if errors.Is(err, membership.ErrUserAlreadyExists) {
+		c.JSON(http.StatusConflict, gin.H{"error": err.Error()})
+		return
+	}
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
