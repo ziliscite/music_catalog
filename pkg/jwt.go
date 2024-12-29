@@ -21,6 +21,7 @@ func CreateToken(id uint, username, secretKey string) (string, error) {
 	if err != nil {
 		return "", err
 	}
+
 	return tokenStr, nil
 }
 
@@ -39,5 +40,6 @@ func ValidateToken(tokenStr, secretKey string) (uint, string, error) {
 	if !token.Valid {
 		return 0, "", errors.New("invalid token")
 	}
+
 	return uint(claims["id"].(float64)), claims["username"].(string), nil
 }
