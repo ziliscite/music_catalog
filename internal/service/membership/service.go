@@ -6,6 +6,7 @@ import (
 	"gorm.io/gorm"
 	"music_catalog/internal/config"
 	"music_catalog/internal/models/membership"
+	"music_catalog/pkg"
 )
 
 // Repository is an interface for user repository.
@@ -35,7 +36,7 @@ func NewService(cfg *config.Config, r Repository) *Service {
 	}
 }
 
-func (s *Service) SignUp(request membership.SignUpRequest) error {
+func (s *Service) SignUp(request *membership.SignUpRequest) error {
 	// check if email already exists
 	email, err := s.r.GetByEmail(request.Email)
 	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
@@ -66,6 +67,28 @@ func (s *Service) SignUp(request membership.SignUpRequest) error {
 		Username: request.Username,
 		Password: string(hashed),
 	})
+}
+
+func (s *Service) SignIn(request *membership.SignInRequest) (string, error) {
+	user, err := s.r.GetByEmail(request.Email)
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		return "", membership.ErrUserNotFound
+	}
+
+	if err != nil {
+		return "", err
+	}
+
+	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(request.Password)); err != nil {
+		return "", membership.ErrInvalidCredentials
+	}
+
+	accessToken, err := pkg.CreateToken(user.ID, user.Username, s.cfg.Service.SecretKey)
+	if err != nil {
+		return "", err
+	}
+
+	return accessToken, nil
 }
 
 // mockgen -source=C:/Users/manzi/GolandProjects/music_catalog/internal/service/membership/service.go -destination=C:/Users/manzi/GolandProjects/music_catalog/internal/service/membership/service_mock.go -package=membership

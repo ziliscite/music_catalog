@@ -156,7 +156,7 @@ func TestService_SignIn(t *testing.T) {
 					Password: "zilzil11111",
 				},
 			},
-			wantErr: true,
+			wantErr: false,
 			mockFn: func(args args) {
 				mockRepository.EXPECT().GetByEmail(args.request.Email).Return(&membership.User{
 					Model: gorm.Model{

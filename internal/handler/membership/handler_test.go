@@ -26,7 +26,7 @@ func TestHandler_SignUp(t *testing.T) {
 		{
 			name: "success",
 			mockFn: func() {
-				mockService.EXPECT().SignUp(membership.SignUpRequest{
+				mockService.EXPECT().SignUp(&membership.SignUpRequest{
 					Email:    "test@gmail.com",
 					Username: "testusername",
 					Password: "password",
@@ -37,7 +37,7 @@ func TestHandler_SignUp(t *testing.T) {
 		{
 			name: "failed when user exists",
 			mockFn: func() {
-				mockService.EXPECT().SignUp(membership.SignUpRequest{
+				mockService.EXPECT().SignUp(&membership.SignUpRequest{
 					Email:    "test@gmail.com",
 					Username: "testusername",
 					Password: "password",
@@ -48,7 +48,7 @@ func TestHandler_SignUp(t *testing.T) {
 		{
 			name: "failed when unknown error",
 			mockFn: func() {
-				mockService.EXPECT().SignUp(membership.SignUpRequest{
+				mockService.EXPECT().SignUp(&membership.SignUpRequest{
 					Email:    "test@gmail.com",
 					Username: "testusername",
 					Password: "password",
@@ -87,6 +87,27 @@ func TestHandler_SignUp(t *testing.T) {
 
 			h.ServeHTTP(w, req)
 			assert.Equal(t, tt.expectedStatusCode, w.Code)
+		})
+	}
+}
+
+func TestHandler_SignIn(t *testing.T) {
+	type args struct {
+		c *gin.Context
+	}
+	tests := []struct {
+		name string
+		args args
+	}{
+		// TODO: Add test cases.
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			h := &Handler{
+				Engine: tt.fields.Engine,
+				s:      tt.fields.s,
+			}
+			h.SignIn(tt.args.c)
 		})
 	}
 }
