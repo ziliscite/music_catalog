@@ -10,7 +10,7 @@ import (
 
 //go:generate mockgen -source=handler.go -destination=handler_mock.go -package=track
 type Service interface {
-	Search(query string, pageSize, pageIndex int) (*model.SearchResponse, error)
+	Search(query string, pageSize, pageIndex int, userId uint) (*model.SearchResponse, error)
 	Upsert(userId uint, request *usertrack.LikeRequest) (bool, error)
 }
 
@@ -41,7 +41,7 @@ func (h *Handler) Search(c *gin.Context) {
 		pageIndex = 1
 	}
 
-	response, err := h.s.Search(query, pageSize, pageIndex)
+	response, err := h.s.Search(query, pageSize, pageIndex, c.GetUint("userID"))
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return

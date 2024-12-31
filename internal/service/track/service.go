@@ -36,7 +36,7 @@ func NewService(cfg *config.Config, rs RepositorySpotify, rut RepositoryUserTrac
 	}
 }
 
-func (s *Service) Search(query string, pageSize, pageIndex int) (*model.SearchResponse, error) {
+func (s *Service) Search(query string, pageSize, pageIndex int, userId uint) (*model.SearchResponse, error) {
 	offset := (pageIndex - 1) * pageSize
 
 	tracks, err := s.rs.Search(query, pageSize, offset)
@@ -44,7 +44,17 @@ func (s *Service) Search(query string, pageSize, pageIndex int) (*model.SearchRe
 		return nil, err
 	}
 
-	return tracks.Model(), nil
+	trackIds := make([]string, len(tracks.Tracks.Items))
+	for idx, item := range tracks.Tracks.Items {
+		trackIds[idx] = item.ID
+	}
+
+	userTracks, err := s.rut.GetAllLiked(userId, trackIds)
+	if err != nil {
+		return nil, err
+	}
+
+	return tracks.Model(userTracks), nil
 }
 
 func (s *Service) Upsert(userId uint, request *usertrack.LikeRequest) (bool, error) {

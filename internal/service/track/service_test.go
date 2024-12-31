@@ -17,7 +17,11 @@ func TestService_Search(t *testing.T) {
 	defer ctrMock.Finish()
 
 	mockSpotifyRepository := NewMockRepositorySpotify(ctrMock)
+	mockUserTrackRepository := NewMockRepositoryUserTrack(ctrMock)
+
 	next := "https://api.spotify.com/v1/search?offset=2&limit=2&query=A%20Little%20Death&type=track&market=US&locale=en-US,en;q%3D0.9,id;q%3D0.8"
+	isLikedTrue := true
+	isLikedFalse := false
 
 	type args struct {
 		q         string
@@ -53,7 +57,7 @@ func TestService_Search(t *testing.T) {
 						Explicit:         false,
 						ID:               "0Ot6e3wYVQQ1Us9PM977jE",
 						Name:             "A Little Death",
-						IsLiked:          nil,
+						IsLiked:          &isLikedTrue,
 					},
 					{
 						AlbumType:        "album",
@@ -64,7 +68,7 @@ func TestService_Search(t *testing.T) {
 						Explicit:         false,
 						ID:               "6ZGgaShxOimGDfRz1T1zje",
 						Name:             "Alexandra",
-						IsLiked:          nil,
+						IsLiked:          &isLikedFalse,
 					},
 				},
 			},
@@ -125,6 +129,16 @@ func TestService_Search(t *testing.T) {
 						},
 					},
 				}, nil)
+
+				mockUserTrackRepository.EXPECT().GetAllLiked(uint(1), []string{"0Ot6e3wYVQQ1Us9PM977jE", "6ZGgaShxOimGDfRz1T1zje"}).
+					Return(map[string]usertrack.UserTrack{
+						"0Ot6e3wYVQQ1Us9PM977jE": {
+							IsLiked: &isLikedTrue,
+						},
+						"6ZGgaShxOimGDfRz1T1zje": {
+							IsLiked: &isLikedFalse,
+						},
+					}, nil)
 			},
 		},
 		{
@@ -151,10 +165,11 @@ func TestService_Search(t *testing.T) {
 						Url: "https://api.spotify.com/v1",
 					},
 				},
-				rs: mockSpotifyRepository,
+				rs:  mockSpotifyRepository,
+				rut: mockUserTrackRepository,
 			}
 
-			got, err := s.Search(tt.args.q, tt.args.pageSize, tt.args.pageIndex)
+			got, err := s.Search(tt.args.q, tt.args.pageSize, tt.args.pageIndex, 1)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Search() error = %v, wantErr %v", err, tt.wantErr)
 				return
