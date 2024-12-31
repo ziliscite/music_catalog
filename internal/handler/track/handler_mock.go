@@ -42,18 +42,18 @@ func (m *MockService) EXPECT() *MockServiceMockRecorder {
 }
 
 // Search mocks base method.
-func (m *MockService) Search(query string, pageSize, pageIndex int) (*spotify.SearchResponse, error) {
+func (m *MockService) Search(query string, pageSize, pageIndex int, userId uint) (*spotify.SearchResponse, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Search", query, pageSize, pageIndex)
+	ret := m.ctrl.Call(m, "Search", query, pageSize, pageIndex, userId)
 	ret0, _ := ret[0].(*spotify.SearchResponse)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // Search indicates an expected call of Search.
-func (mr *MockServiceMockRecorder) Search(query, pageSize, pageIndex any) *gomock.Call {
+func (mr *MockServiceMockRecorder) Search(query, pageSize, pageIndex, userId any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Search", reflect.TypeOf((*MockService)(nil).Search), query, pageSize, pageIndex)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Search", reflect.TypeOf((*MockService)(nil).Search), query, pageSize, pageIndex, userId)
 }
 
 // Upsert mocks base method.

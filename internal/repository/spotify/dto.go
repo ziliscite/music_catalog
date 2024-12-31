@@ -1,12 +1,15 @@
 package spotify
 
-import "music_catalog/internal/model/spotify"
+import (
+	"music_catalog/internal/model/spotify"
+	"music_catalog/internal/model/usertrack"
+)
 
 type ClientSearchResponse struct {
 	Tracks Tracks `json:"tracks"`
 }
 
-func (c *ClientSearchResponse) Model() *spotify.SearchResponse {
+func (c *ClientSearchResponse) Model(userTracks map[string]usertrack.UserTrack) *spotify.SearchResponse {
 	tracks := make([]spotify.TrackObject, 0)
 	for _, item := range c.Tracks.Items {
 		artistsName := make([]string, len(item.Artists))
@@ -31,6 +34,8 @@ func (c *ClientSearchResponse) Model() *spotify.SearchResponse {
 			Explicit: item.Explicit,
 			ID:       item.ID,
 			Name:     item.Name,
+
+			IsLiked: userTracks[item.ID].IsLiked,
 		})
 	}
 
