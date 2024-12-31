@@ -5,7 +5,7 @@ import (
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 	"music_catalog/internal/config"
-	"music_catalog/internal/models/membership"
+	"music_catalog/internal/model/membership"
 	"music_catalog/pkg"
 )
 

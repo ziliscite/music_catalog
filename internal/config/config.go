@@ -20,6 +20,7 @@ type DatabaseConfig struct {
 type SpotifyConfig struct {
 	ClientID     string
 	ClientSecret string
+	Url          string
 }
 
 var config *Config

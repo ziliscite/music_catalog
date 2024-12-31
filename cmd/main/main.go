@@ -6,9 +6,14 @@ import (
 	"log"
 	"music_catalog/internal/config"
 	membershipHandler "music_catalog/internal/handler/membership"
-	membershipModel "music_catalog/internal/models/membership"
+	trackHandler "music_catalog/internal/handler/track"
+	membershipModel "music_catalog/internal/model/membership"
+	usertrackModel "music_catalog/internal/model/usertrack"
 	membershipRepository "music_catalog/internal/repository/membership"
+	spotifyRepository "music_catalog/internal/repository/spotify"
+	usertrackRepository "music_catalog/internal/repository/usertrack"
 	membershipService "music_catalog/internal/service/membership"
+	trackService "music_catalog/internal/service/track"
 	"music_catalog/pkg"
 	"net/http"
 )
@@ -22,7 +27,7 @@ func main() {
 	}
 
 	// migrations with gorm -- will create tables
-	err = db.AutoMigrate(&membershipModel.User{})
+	err = db.AutoMigrate(&membershipModel.User{}, &usertrackModel.UserTrack{})
 	if err != nil {
 		log.Fatalf("failed to migrate database: %v", err)
 	}
@@ -30,8 +35,18 @@ func main() {
 	router := NewRouter()
 
 	NewMembership(router, db, cfg)
+	NewTrack(router, db, cfg)
 
 	_ = router.Run(cfg.Service.Port)
+}
+
+func NewTrack(router *gin.Engine, db *gorm.DB, cfg *config.Config) {
+	client := pkg.NewClient(&http.Client{})
+	userTrackRepo := usertrackRepository.NewRepository(db)
+	spotifyRepo := spotifyRepository.NewRepository(cfg, client)
+	service := trackService.NewService(cfg, spotifyRepo, userTrackRepo)
+	handler := trackHandler.NewHandler(router, service)
+	handler.RegisterRoutes()
 }
 
 func NewMembership(router *gin.Engine, db *gorm.DB, cfg *config.Config) {

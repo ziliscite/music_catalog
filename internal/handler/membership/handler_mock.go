@@ -10,7 +10,7 @@
 package membership
 
 import (
-	membership "music_catalog/internal/models/membership"
+	membership "music_catalog/internal/model/membership"
 	reflect "reflect"
 
 	gomock "go.uber.org/mock/gomock"

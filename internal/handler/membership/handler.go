@@ -3,7 +3,7 @@ package membership
 import (
 	"errors"
 	"github.com/gin-gonic/gin"
-	"music_catalog/internal/models/membership"
+	"music_catalog/internal/model/membership"
 	"net/http"
 )
 
