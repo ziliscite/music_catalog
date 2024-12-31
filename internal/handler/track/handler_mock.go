@@ -11,6 +11,7 @@ package track
 
 import (
 	spotify "music_catalog/internal/model/spotify"
+	usertrack "music_catalog/internal/model/usertrack"
 	reflect "reflect"
 
 	gomock "go.uber.org/mock/gomock"
@@ -53,4 +54,19 @@ func (m *MockService) Search(query string, pageSize, pageIndex int) (*spotify.Se
 func (mr *MockServiceMockRecorder) Search(query, pageSize, pageIndex any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Search", reflect.TypeOf((*MockService)(nil).Search), query, pageSize, pageIndex)
+}
+
+// Upsert mocks base method.
+func (m *MockService) Upsert(userId uint, request *usertrack.LikeRequest) (bool, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Upsert", userId, request)
+	ret0, _ := ret[0].(bool)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// Upsert indicates an expected call of Upsert.
+func (mr *MockServiceMockRecorder) Upsert(userId, request any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Upsert", reflect.TypeOf((*MockService)(nil).Upsert), userId, request)
 }

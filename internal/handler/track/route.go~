@@ -1,6 +1,0 @@
-package track
-
-func (h *Handler) RegisterRoutes() {
-	r := h.Group("/track")
-	r.GET("/search", h.Search)
-}

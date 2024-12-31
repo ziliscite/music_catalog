@@ -8,13 +8,13 @@ type SearchResponse struct {
 }
 
 type TrackObject struct {
-	// album related fields
+	// album-related fields
 	AlbumType        string   `json:"albumType"`
 	AlbumTotalTracks int      `json:"totalTracks"`
 	AlbumImagesURL   []string `json:"albumImagesURL"`
 	AlbumName        string   `json:"albumName"`
 
-	// artist related fields
+	// artist-related fields
 	ArtistsName []string `json:"artistsName"`
 
 	// track related fields

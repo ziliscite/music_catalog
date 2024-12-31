@@ -155,16 +155,18 @@ func TestHandler_SignIn(t *testing.T) {
 			wantErr:            true,
 		},
 	}
+
+	engine := gin.New()
+	h := &Handler{
+		Engine: engine,
+		s:      mockService,
+	}
+	h.RegisterRoutes()
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			tt.mockFn()
-			api := gin.New()
 
-			h := &Handler{
-				Engine: api,
-				s:      mockService,
-			}
-			h.RegisterRoutes()
 			w := httptest.NewRecorder()
 
 			endpoint := `/membership/signin`

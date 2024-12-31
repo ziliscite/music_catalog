@@ -1,11 +1,13 @@
 package track
 
 import (
+	"bytes"
 	"encoding/json"
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
 	"go.uber.org/mock/gomock"
 	model "music_catalog/internal/model/spotify"
+	usertrackModel "music_catalog/internal/model/usertrack"
 	"music_catalog/pkg"
 	"net/http"
 	"net/http/httptest"
@@ -90,6 +92,15 @@ func TestHandler_Search(t *testing.T) {
 				},
 			},
 		},
+		{
+			name:               "failed",
+			expectedStatusCode: 400,
+			expectedBody:       model.SearchResponse{},
+			wantErr:            true,
+			mockFn: func() {
+				mockService.EXPECT().Search("A Little Death", 2, 1).Return(nil, assert.AnError)
+			},
+		},
 	}
 
 	engine := gin.New()
@@ -126,6 +137,85 @@ func TestHandler_Search(t *testing.T) {
 
 				assert.Equal(t, tt.expectedBody, response)
 			}
+		})
+	}
+}
+
+func TestHandler_Upsert(t *testing.T) {
+	ctrMock := gomock.NewController(t)
+	defer ctrMock.Finish()
+
+	mockService := NewMockService(ctrMock)
+
+	isLikedTrue := true
+	tests := []struct {
+		name               string
+		mockFn             func()
+		expectedStatusCode int
+	}{
+		{
+			name: "success: created",
+			mockFn: func() {
+				mockService.EXPECT().Upsert(uint(1), &usertrackModel.LikeRequest{
+					TrackID: "0Ot6e3wYVQQ1Us9PM977jE",
+					IsLiked: &isLikedTrue,
+				}).Return(true, nil)
+			},
+			expectedStatusCode: http.StatusCreated,
+		},
+		{
+			name: "success: updated",
+			mockFn: func() {
+				mockService.EXPECT().Upsert(uint(1), &usertrackModel.LikeRequest{
+					TrackID: "0Ot6e3wYVQQ1Us9PM977jE",
+					IsLiked: &isLikedTrue,
+				}).Return(false, nil)
+			},
+			expectedStatusCode: http.StatusOK,
+		},
+		{
+			name: "failed",
+			mockFn: func() {
+				mockService.EXPECT().Upsert(uint(1), &usertrackModel.LikeRequest{
+					TrackID: "0Ot6e3wYVQQ1Us9PM977jE",
+					IsLiked: &isLikedTrue,
+				}).Return(assert.AnError)
+			},
+			expectedStatusCode: http.StatusBadRequest,
+		},
+	}
+
+	engine := gin.New()
+	h := &Handler{
+		Engine: engine,
+		s:      mockService,
+	}
+	h.RegisterRoutes()
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			tt.mockFn()
+
+			w := httptest.NewRecorder()
+
+			endpoint := `/track/upsert`
+
+			payload := usertrackModel.LikeRequest{
+				TrackID: "0Ot6e3wYVQQ1Us9PM977jE",
+				IsLiked: &isLikedTrue,
+			}
+			payloadBytes, err := json.Marshal(payload)
+			assert.NoError(t, err)
+
+			// aborting test due to missing call(s) -- biasanya karna salah http method
+			req, err := http.NewRequest(http.MethodPost, endpoint, bytes.NewReader(payloadBytes))
+			assert.NoError(t, err)
+			token, err := pkg.CreateToken(1, "username", "")
+			assert.NoError(t, err)
+			req.Header.Set("Authorization", token)
+
+			h.ServeHTTP(w, req)
+			assert.Equal(t, tt.expectedStatusCode, w.Code)
 		})
 	}
 }
