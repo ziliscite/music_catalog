@@ -5,7 +5,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
-	"music_catalog/internal/models/membership"
+	"music_catalog/internal/model/membership"
 	"testing"
 	"time"
 )

@@ -2,7 +2,7 @@ package membership
 
 import (
 	"gorm.io/gorm"
-	"music_catalog/internal/models/membership"
+	"music_catalog/internal/model/membership"
 )
 
 type Repository struct {

@@ -5,7 +5,7 @@ import (
 	"go.uber.org/mock/gomock"
 	"gorm.io/gorm"
 	"music_catalog/internal/config"
-	"music_catalog/internal/models/membership"
+	"music_catalog/internal/model/membership"
 	"testing"
 )
 
