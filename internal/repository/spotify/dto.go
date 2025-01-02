@@ -48,7 +48,42 @@ func (c *ClientSearchResponse) Model(userTracks map[string]usertrack.UserTrack) 
 }
 
 type RecommendationResponse struct {
-	Tracks []TrackObject `json:"tracks"`
+	Items []TrackObject `json:"items"`
+}
+
+func (r *RecommendationResponse) Model(userTracks map[string]usertrack.UserTrack) *spotify.RecommendationResponse {
+	tracks := make([]spotify.TrackObject, 0)
+	for _, item := range r.Items {
+		artistsName := make([]string, len(item.Artists))
+		for idx, artist := range item.Artists {
+			artistsName[idx] = artist.Name
+		}
+
+		imageUrls := make([]string, len(item.Album.Images))
+		for idx, image := range item.Album.Images {
+			imageUrls[idx] = image.URL
+		}
+
+		tracks = append(tracks, spotify.TrackObject{
+			// album related fields
+			AlbumType:        item.Album.AlbumType,
+			AlbumTotalTracks: item.Album.TotalTracks,
+			AlbumImagesURL:   imageUrls,
+			AlbumName:        item.Album.Name,
+			// artist related fields
+			ArtistsName: artistsName,
+			// track related fields
+			Explicit: item.Explicit,
+			ID:       item.ID,
+			Name:     item.Name,
+
+			IsLiked: userTracks[item.ID].IsLiked,
+		})
+	}
+
+	return &spotify.RecommendationResponse{
+		Items: tracks,
+	}
 }
 
 type Tracks struct {

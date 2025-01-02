@@ -35,7 +35,7 @@ func (c *ClientSearchResponse) Model(userTracks map[string]usertrack.UserTrack) 
 			ID:       item.ID,
 			Name:     item.Name,
 
-			IsLiked: userTracks,
+			IsLiked: userTracks[item.ID].IsLiked,
 		})
 	}
 
