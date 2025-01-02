@@ -12,6 +12,7 @@ import (
 //go:generate mockgen -source=service.go -destination=service_mock.go -package=track
 type RepositorySpotify interface {
 	Search(q string, limit, offset int) (*dto.ClientSearchResponse, error)
+	GetRecommendation(limit int, trackID string) (*dto.RecommendationResponse, error)
 }
 
 //go:generate mockgen -source=service.go -destination=service_mock.go -package=track
@@ -72,4 +73,23 @@ func (s *Service) Upsert(userId uint, request *usertrack.LikeRequest) (bool, err
 
 	// create a new user track otherwise
 	return true, s.rut.Create(request.Model(userId))
+}
+
+func (s *Service) GetRecommendation(userId uint, limit int, trackId string) (*model.RecommendationResponse, error) {
+	trackDetails, err := s.rs.GetRecommendation(limit, trackId)
+	if err != nil {
+		return nil, err
+	}
+
+	trackIDs := make([]string, len(trackDetails.Items))
+	for idx, item := range trackDetails.Items {
+		trackIDs[idx] = item.ID
+	}
+
+	trackActivities, err := s.rut.GetAllLiked(userId, trackIDs)
+	if err != nil {
+		return nil, err
+	}
+
+	return trackDetails.Model(trackActivities), nil
 }

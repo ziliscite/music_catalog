@@ -122,3 +122,40 @@ func (r *Repository) Search(q string, limit, offset int) (*ClientSearchResponse,
 
 	return &response, nil
 }
+
+func (r *Repository) GetRecommendation(limit int, trackID string) (*RecommendationResponse, error) {
+	endpoint := url.Values{
+		"limit":       []string{strconv.Itoa(limit)},
+		"market":      []string{"ID"},
+		"seed_tracks": []string{trackID},
+	}
+
+	path := fmt.Sprintf("%s/recommendations?%s", r.cfg.SpotifyConfig.Url, endpoint.Encode())
+
+	req, err := http.NewRequest(http.MethodGet, path, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	accessToken, tokenType, err := r.GetToken()
+	if err != nil {
+		return nil, err
+	}
+
+	auth := fmt.Sprintf("%s %s", tokenType, accessToken)
+	req.Header.Set("Authorization", auth)
+
+	resp, err := r.client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	var response RecommendationResponse
+	err = json.NewDecoder(resp.Body).Decode(&response)
+	if err != nil {
+		return nil, err
+	}
+
+	return &response, nil
+}

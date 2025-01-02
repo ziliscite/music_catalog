@@ -12,6 +12,7 @@ import (
 type Service interface {
 	Search(query string, pageSize, pageIndex int, userId uint) (*model.SearchResponse, error)
 	Upsert(userId uint, request *usertrack.LikeRequest) (bool, error)
+	GetRecommendation(userId uint, limit int, trackId string) (*model.RecommendationResponse, error)
 }
 
 type Handler struct {
@@ -69,4 +70,22 @@ func (h *Handler) Upsert(c *gin.Context) {
 	}
 
 	c.Status(http.StatusCreated)
+}
+
+func (h *Handler) GetRecommendation(c *gin.Context) {
+	trackID := c.Query("trackID")
+	limitStr := c.Query("limit")
+
+	limit, err := strconv.Atoi(limitStr)
+	if err != nil {
+		limit = 10
+	}
+
+	response, err := h.s.GetRecommendation(c.GetUint("userID"), limit, trackID)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, response)
 }
